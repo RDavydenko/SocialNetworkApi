@@ -1,0 +1,72 @@
+﻿@{
+   Layout = null;
+   ViewData["Title"] = "Home Page";
+}
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+        crossorigin="anonymous"></script>
+
+<div id="result"></div>
+
+<div class="form m-auto" style="max-width:600px">
+   <div class="form-group">
+      <label>
+         Имя
+      </label>
+      <input id="username" class="form-control" type="text" placeholder="Введите имя" />
+   </div>
+   <div class="form-group">
+      <label>
+         Пароль
+      </label>
+      <input id="password" class="form-control" type="password" placeholder="Введите пароль" />
+   </div>
+   <div class="form-group">
+      <button id="send-btn" type="button" class="btn btn-success">Отправить</button>
+   </div>
+</div>
+<script>
+   $("#send-btn").click(function () {
+      $.ajax({
+         url: "https://localhost:44302/api/auth/signin",
+         type: "POST",
+         contentType: 'application/json; charset=utf-8',
+         dataType: 'json',
+         data: JSON.stringify({
+            username: $("#username").val(),
+            password: $("#password").val()
+         }),
+         statusCode: {
+            200: function () {
+               $("#result").append("<div class='alert alert-success'>Успешный вход</div>");
+            },
+            400: function () {
+               $("#result").append("<div class='alert alert-danger'>Возникла ошибка</div>");
+            },
+            404: function () {
+               $("#result").append("<div class='alert alert-danger'>Возникла ошибка</div>");
+            }
+         }
+      })
+   });
+</script>
+<button id="give-me" type="button" class="btn btn-info">Загрузить</button>
+<div id="area"></div>
+<script>
+   $("#give-me").click(function () {
+      $.ajax({
+         url: "https://localhost:44302/api/users/give",
+         type: "GET",
+         dataType: 'json',
+         success: (result) => {           
+            for (var i = 0; i < result.length; i++) {
+               $("#area").append("<p class='ml-2'> Имя " + result[i].name + " Возраст " + result[i].age + " Пол: " + result[i].sex + "</p>");
+            }
+         },
+         error: (result) => {
+            console.log(result);
+         }
+      })
+   });
+</script>
