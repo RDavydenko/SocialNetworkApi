@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetworkApi.Models;
+using SocialNetworkApi.ViewModels;
 
 namespace SocialNetworkApi.Controllers
 {
@@ -38,7 +39,6 @@ namespace SocialNetworkApi.Controllers
 	[ApiController]
 	public class MessagesController : ControllerBase
 	{		
-
 		public MessagesController()
 		{
 			

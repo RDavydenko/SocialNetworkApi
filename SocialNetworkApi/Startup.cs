@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SocialNetworkApi.Middlewares;
 using SocialNetworkApi.Models;
 
 namespace SocialNetworkApi
@@ -33,7 +34,7 @@ namespace SocialNetworkApi
 			{
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 			});
-			services.AddIdentity<User, IdentityRole>(options =>
+			services.AddIdentity<User, IdentityRole<int>>(options =>
 			{
 				options.Password.RequireDigit = false;
 				options.Password.RequireLowercase = false;
@@ -68,6 +69,8 @@ namespace SocialNetworkApi
 
 			app.UseAuthentication();
 			app.UseAuthorization();
+
+			app.UseMiddleware<DbInitializeMiddleware>();
 
 			app.UseEndpoints(endpoints =>
 			{
