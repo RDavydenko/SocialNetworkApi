@@ -33,16 +33,16 @@ namespace SocialNetworkApi.Controllers
 				var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, false, false);
 				if (result.Succeeded)
 				{
-					return Ok();
+					return new JsonResult(new Response { Ok = true, StatusCode = 200 });
 				}
 				else
 				{
-					return NotFound();
+					return new JsonResult(new Response { Ok = false, StatusCode = 404});
 				}
 			}
 			else
 			{
-				return BadRequest();
+				return new JsonResult(new Response { Ok = false, StatusCode = 400 });
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace SocialNetworkApi.Controllers
 		public async Task<IActionResult> SignOut()
 		{
 			await _signInManager.SignOutAsync();
-			return Ok();
+			return new JsonResult(new Response { Ok = true, StatusCode = 200 });
 		}
 	}
 }

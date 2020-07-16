@@ -22,10 +22,11 @@ namespace SocialNetworkApi.Middlewares
 
 		public async Task InvokeAsync(HttpContext context)
 		{
-
 			_db = context.RequestServices.GetService(typeof(ApplicationContext)) as ApplicationContext;
 			_userManager = context.RequestServices.GetService(typeof(UserManager<User>)) as UserManager<User>;
 
+			if (_db.Users.Count() != 0)
+				return;
 
 			var user1 = new User { UserName = "Roman", NormalizedUserName = "ROMAN" };
 			var user2 = new User { UserName = "Admin", NormalizedUserName = "ADMIN" };
