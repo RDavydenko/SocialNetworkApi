@@ -11,7 +11,7 @@ namespace SocialNetworkApi.ViewModels
 		public int Id { get; set; }
 		public string Text { get; set; }
 		public DateTime SendingTime { get; set; }
-		public int AuthorId { get; set; }
+		public int? AuthorId { get; set; }
 
 		public MessageViewModel()
 		{

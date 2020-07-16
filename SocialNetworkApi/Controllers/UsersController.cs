@@ -27,7 +27,7 @@ namespace SocialNetworkApi.Controllers
 		}
 
 		[HttpGet]
-		[Route("get/{id}")]
+		[Route("{id}")]
 		public async Task<IActionResult> Get([FromRoute] int id)
 		{
 			if (ModelState.IsValid)

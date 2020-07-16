@@ -11,7 +11,7 @@ namespace SocialNetworkApi.Models
 		public int DialogId { get; set; }
 		public Dialog Dialog { get; set; }
 
-		public int AuthorId { get; set; }
+		public int? AuthorId { get; set; }
 		public User Author { get; set; }
 	}
 }

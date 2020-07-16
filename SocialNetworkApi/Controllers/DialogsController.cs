@@ -67,6 +67,62 @@ namespace SocialNetworkApi.Controllers
 			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
 		}
 
+		[HttpGet]
+		[Route("{id}/members")]
+		public async Task<IActionResult> GetMembers([FromRoute] int id)
+		{
+			if (ModelState.IsValid)
+			{
+				int userId = (await _userManager.GetUserAsync(User)).Id;
+				var userToDialog = await _context.UserToDialogs
+					.Include(d => d.Dialog)
+					.ThenInclude(d => d.Users)
+					.FirstOrDefaultAsync(d => d.DialogId == id && d.UserId == userId);
+
+				if (userToDialog == null)
+				{
+					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				}
+
+				var users = userToDialog.Dialog.Users.Select(u => u.UserId).ToList();
+				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = users });
+			}
+			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+		}
+
+		[HttpPost]
+		[Route("{id}/message")]
+		public async Task<IActionResult> CreateNewMessage([FromRoute] int id, [FromBody] MessageTextViewModel model)
+		{
+			if (ModelState.IsValid)
+			{
+				var dialog = await _context.Dialogs
+				.Include(d => d.Users)
+				.FirstOrDefaultAsync(d => d.Id == id);
+				if (dialog == null)
+				{
+					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				}
+
+				var currentUser = await _userManager.GetUserAsync(User);
+				if (!dialog.Users.Exists(d => d.UserId == currentUser.Id)) // Пользователь не состоит в диалоге
+				{
+					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+				}
+
+				if (string.IsNullOrWhiteSpace(model.Text) || model.Text.Length > 10000)
+				{
+					return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+				}
+
+				var newMessage = new Message { AuthorId = currentUser.Id, DialogId = dialog.Id, Text = model.Text, SendingTime = DateTime.Now };
+				_context.Messages.Add(newMessage);
+				await _context.SaveChangesAsync();
+				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = new MessageViewModel(newMessage) });
+			}
+			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+		}
+
 		[HttpPost]
 		[Route("create")]
 		public async Task<IActionResult> CreateDialog([FromBody] DialogSimpleViewModel model)
@@ -87,6 +143,61 @@ namespace SocialNetworkApi.Controllers
 
 			var dialogViewModel = new DialogSimpleViewModel(newDialog);
 			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = dialogViewModel });
+		}
+
+		[HttpPost]
+		[Route("{id}/add")]
+		public async Task<IActionResult> AddUsers([FromRoute] int id, [FromBody] ListIds<int> userIds)
+		{
+			var dialog = await _context.Dialogs
+				.Include(d => d.Users)
+				.FirstOrDefaultAsync(d => d.Id == id);
+			if (dialog == null)
+			{
+				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+			}
+
+			var currentUser = await _userManager.GetUserAsync(User);
+			if (!dialog.Users.Exists(d => d.UserId == currentUser.Id)) // Пользователь не состоит в диалоге
+			{
+				return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+			}
+
+			var userToDialogs = new List<Models.NToNs.UserToDialog>();
+			foreach (int userId in userIds.Ids)
+			{
+				if (!dialog.Users.Exists(d => d.UserId == userId) && _context.Users.Any(u => u.Id == userId)) // Пользователь не состоит в диалоге
+				{
+					userToDialogs.Add(new Models.NToNs.UserToDialog { UserId = userId, DialogId = dialog.Id });
+				}
+			}
+			await _context.UserToDialogs.AddRangeAsync(userToDialogs);
+			await _context.SaveChangesAsync();
+			return new JsonResult(new Response { Ok = true, StatusCode = 200 });
+		}
+
+		[HttpPost]
+		[Route("{id}/leave")]
+		public async Task<IActionResult> LeaveFromDialog([FromRoute] int id)
+		{
+			var dialog = await _context.Dialogs
+				.Include(d => d.Users)
+				.FirstOrDefaultAsync(d => d.Id == id);
+			if (dialog == null)
+			{
+				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+			}
+
+			var currentUser = await _userManager.GetUserAsync(User);
+
+			var userToDialog = dialog.Users.FirstOrDefault(d => d.UserId == currentUser.Id);
+			if (userToDialog == null)
+			{
+				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+			}
+			_context.UserToDialogs.Remove(userToDialog);
+			await _context.SaveChangesAsync();
+			return new JsonResult(new Response { Ok = true, StatusCode = 200 });
 		}
 	}
 }

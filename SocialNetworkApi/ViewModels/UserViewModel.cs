@@ -47,15 +47,15 @@ namespace SocialNetworkApi.ViewModels
 			bool dateIsParsed = DateTime.TryParse(this?.BirthdayDate, out DateTime newDate);
 			user.BirthdayDate = dateIsParsed == true ? newDate : user.BirthdayDate;
 
-			if (Enum.IsDefined(typeof(Sex), Sex))
+			if (Sex != null && Enum.IsDefined(typeof(Sex), Sex))
 			{
 				user.Sex = this?.Sex ?? user.Sex;
 			}
 
-			if (Status.Length < 300)
+			if (Status != null && Status.Length < 300)
 			{
 				user.Status = Status;
-			}				
+			}
 		}
 	}
 }

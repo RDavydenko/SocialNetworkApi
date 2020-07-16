@@ -60,16 +60,21 @@ namespace SocialNetworkApi.Controllers
 				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
 			}
 
-			var message = await _context.Messages.FirstOrDefaultAsync(m => m.AuthorId == currentUser.Id && m.Id == id);
+			var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
 			if (message == null)
 			{
 				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
 			}
 
+			if (message.AuthorId != currentUser.Id)
+			{
+				return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+			}
+
 			var messageViewModel = new MessageViewModel(message);
 			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = messageViewModel });
-		}
-
+		}		
+		
 		//// GET api/messages/{id}
 		//[HttpGet]
 		//[Route("{id}")]
