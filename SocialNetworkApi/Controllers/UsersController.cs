@@ -12,7 +12,6 @@ using SocialNetworkApi.ViewModels;
 
 namespace SocialNetworkApi.Controllers
 {
-
 	[Produces("application/json")]
 	[Route("api/[controller]")]
 	[ApiController]
@@ -45,8 +44,8 @@ namespace SocialNetworkApi.Controllers
 		}
 
 		[HttpPost]
-		[Route("edit")]
 		[Authorize]
+		[Route("edit")]
 		public async Task<IActionResult> Edit([FromBody] UserViewModel model)
 		{
 			var currentUser = await _userManager.GetUserAsync(User);
@@ -59,7 +58,7 @@ namespace SocialNetworkApi.Controllers
 			await _context.SaveChangesAsync();
 
 			var userViewModel = new UserViewModel(currentUser);
-			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = userViewModel });			
-		}
+			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = userViewModel });
+		}		
 	}
 }

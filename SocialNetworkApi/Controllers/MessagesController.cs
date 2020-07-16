@@ -6,7 +6,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SocialNetworkApi.Models;
 using SocialNetworkApi.ViewModels;
 
@@ -38,28 +40,35 @@ namespace SocialNetworkApi.Controllers
 	[Route("api/[controller]")]
 	[ApiController]
 	public class MessagesController : ControllerBase
-	{		
-		public MessagesController()
+	{
+		private readonly ApplicationContext _context;
+		private readonly UserManager<User> _userManager;
+
+		public MessagesController([FromServices] ApplicationContext context, [FromServices] UserManager<User> userManager)
 		{
-			
+			_context = context;
+			_userManager = userManager;
 		}
 
 		[HttpGet]
-		public IActionResult Get()
+		[Route("{id}")]
+		public async Task<IActionResult> Get([FromRoute] int id)
 		{
-			return new JsonResult("Liza");
-		}
+			var currentUser = await _userManager.GetUserAsync(User);
+			if (currentUser == null)
+			{
+				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+			}
 
-		// GET api/messages
-		//[HttpGet]
-		//public IActionResult Get()
-		//{
-		//	return new JsonResult(_repository.Entities.Select(x => new { Id = x.Id, Text = x.Text }), new JsonSerializerOptions
-		//	{
-		//		IgnoreNullValues = true,
-		//		WriteIndented = true,
-		//	});
-		//}
+			var message = await _context.Messages.FirstOrDefaultAsync(m => m.AuthorId == currentUser.Id && m.Id == id);
+			if (message == null)
+			{
+				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+			}
+
+			var messageViewModel = new MessageViewModel(message);
+			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = messageViewModel });
+		}
 
 		//// GET api/messages/{id}
 		//[HttpGet]
