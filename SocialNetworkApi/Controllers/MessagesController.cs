@@ -52,7 +52,7 @@ namespace SocialNetworkApi.Controllers
 
 		[HttpGet]
 		[Route("{id}")]
-		public async Task<IActionResult> GetMessage([FromRoute] int id)
+		public async Task<IActionResult> Get([FromRoute] int id)
 		{
 			var currentUser = await _userManager.GetUserAsync(User);
 			if (currentUser == null)
@@ -73,63 +73,79 @@ namespace SocialNetworkApi.Controllers
 
 			var messageViewModel = new MessageViewModel(message);
 			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = messageViewModel });
-		}
-
+		}		
 		
-		[HttpPost]
-		[Route("{id}/edit")]
-		public async Task<IActionResult> EditMessage([FromRoute] int id, [FromBody] MessageTextViewModel model)
-		{
-			if (ModelState.IsValid)
-			{
-				var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
-				if (message == null)
-				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
-				}
+		//// GET api/messages/{id}
+		//[HttpGet]
+		//[Route("{id}")]
+		//public IActionResult GetById([FromRoute] int id)
+		//{
+		//	var message = _repository.Entities.FirstOrDefault(m => m.Id == id);
+		//	if (message == null)
+		//	{
+		//		return NotFound();
+		//	}
 
-				var currentUser = await _userManager.GetUserAsync(User);
-				if (message.AuthorId != currentUser.Id)
-				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
-				}
+		//	return new JsonResult(message, new JsonSerializerOptions
+		//	{
+		//		IgnoreNullValues = true,
+		//		WriteIndented = true,
+		//	});
+		//}
 
-				if (string.IsNullOrWhiteSpace(model.Text) || model.Text.Length < 1 || model.Text.Length > 10000)
-				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 400 });
-				}
+		//// POST api/messages
+		//[HttpPost]
+		//public IActionResult Create([FromBody] Message model) // Ожидается поле с именем "text"
+		//{
+		//	var text = model.Text;
+		//	if (string.IsNullOrWhiteSpace(text))
+		//	{
+		//		return Problem();
+		//	}
+		//	var newMessage = new Message { Id = _repository.NextId, Text = text, SendingTime = DateTime.Now };
+		//	_repository.Entities.Add(newMessage);
+		//	_repository.NextId++;
 
-				message.Text = model.Text;
-				_context.Messages.Update(message);
-				await _context.SaveChangesAsync();
-				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = new MessageViewModel(message) }); 
-			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
-		}
-		
-		[HttpPost]
-		[Route("{id}/delete")]
-		public async Task<IActionResult> DeleteMessage([FromRoute] int id)
-		{
-			if (ModelState.IsValid)
-			{
-				var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
-				if (message == null)
-				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
-				}
+		//	return new JsonResult(newMessage, new JsonSerializerOptions
+		//	{
+		//		IgnoreNullValues = true,
+		//		WriteIndented = true,
+		//	});
+		//}
 
-				var currentUser = await _userManager.GetUserAsync(User);
-				if (message.AuthorId != currentUser.Id)
-				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
-				}
-								
-				_context.Messages.Remove(message);
-				await _context.SaveChangesAsync();
-				return new JsonResult(new Response { Ok = true, StatusCode = 200 });
-			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
-		}
+		//// PUT api/messages/{id}
+		//[HttpPut]
+		//[Route("{id}")]
+		//public IActionResult EditById([FromRoute] int id, [FromBody] Message model) // Ожидается поле с именем "text"
+		//{
+		//	var message = _repository.Entities.Where(m => m.Id == id).FirstOrDefault();
+		//	var text = model.Text;
+		//	if (message == null)
+		//		return NotFound();
+
+		//	if (string.IsNullOrWhiteSpace(text))
+		//	{
+		//		return Problem();
+		//	}
+		//	message.Text = text;
+		//	return new JsonResult(message, new JsonSerializerOptions
+		//	{
+		//		IgnoreNullValues = true,
+		//		WriteIndented = true,
+		//	});
+		//}
+
+		//// DELETE api/messages/{id}
+		//[HttpDelete]
+		//[Route("{id}")]
+		//public IActionResult DeleteById([FromRoute] int id)
+		//{
+		//	var message = _repository.Entities.Where(m => m.Id == id).FirstOrDefault();
+		//	if (message == null)
+		//		return NotFound();
+
+		//	_repository.Entities.Remove(message);
+		//	return Ok();
+		//}
 	}
 }
