@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using SocialNetworkApi.Models.NToNs;
 
 namespace SocialNetworkApi.Models
@@ -14,7 +15,7 @@ namespace SocialNetworkApi.Models
 		public DbSet<Message> Messages { get; set; }
 		public DbSet<Dialog> Dialogs { get; set; }
 
-		//public DbSet<NToNs.UserToFriend> UserToFriends { get; set; }
+		public DbSet<NToNs.UserToFriend> UserToFriends { get; set; }
 		//public DbSet<NToNs.UserToRequest> UserToRequests { get; set; }
 		//public DbSet<NToNs.UserToFollower> UserToFollowers { get; set; }
 		public DbSet<NToNs.UserToDialog> UserToDialogs { get; set; }
@@ -40,11 +41,8 @@ namespace SocialNetworkApi.Models
 				.HasForeignKey(m => m.AuthorId)
 				.OnDelete(DeleteBehavior.NoAction);
 
-				//u.HasMany(u => u.Friends) // ✔
-				//.WithOne(uf => uf.User)
-				//.HasForeignKey(uf => uf.UserId)
-				//.OnDelete(DeleteBehavior.NoAction);
-			});			
+
+			});
 
 			builder.Entity<Message>(m =>
 			{
@@ -54,7 +52,7 @@ namespace SocialNetworkApi.Models
 				.OnDelete(DeleteBehavior.SetNull); // При удалении автора, что происходит с сообщением?
 			});
 
-			builder.Entity<UserToDialog>(ud => 
+			builder.Entity<UserToDialog>(ud =>
 			{
 				ud.HasOne(ud => ud.User) // ✔
 				.WithMany(u => u.Dialogs)
@@ -67,17 +65,19 @@ namespace SocialNetworkApi.Models
 				.OnDelete(DeleteBehavior.Cascade);
 			});
 
-			//builder.Entity<UserToFriend>(uf =>
-			//{
-			//	uf.HasOne(uf => uf.User)
-			//	.WithMany(u => u.Friends)
-			//	.HasForeignKey(ud => ud.UserId)
-			//	.OnDelete(DeleteBehavior.Cascade);
-			//});
-
-
-
+			builder.Entity<UserToFriend>(uf =>
+			{
+				uf.HasOne(uf => uf.User) // ✔
+				.WithMany(u => u.Friends)
+				.HasForeignKey(ud => ud.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+				// При удалении главного User'а (по UserId) удаляется запись каскдно
+				// Нужен еще и триггер, который будет ставить null при удалении FriendId User'а - добавляется вручную (Resources/SQL/trigger_set_null_v2.sql)
+				
+			});
+			
+			
 			base.OnModelCreating(builder);
-		}
+		}		
 	}
 }

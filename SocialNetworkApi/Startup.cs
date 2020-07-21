@@ -70,7 +70,7 @@ namespace SocialNetworkApi
 			app.UseAuthentication();
 			app.UseAuthorization();
 
-			//app.UseMiddleware<DbInitializeMiddleware>();
+			app.UseMiddleware<DbInitializeMiddleware>();			
 
 			app.UseEndpoints(endpoints =>
 			{

@@ -71,23 +71,23 @@ namespace SocialNetworkApi.Middlewares
 			await _db.SaveChangesAsync();
 
 
-			//user1.Friends = new List<UserToFriend>
-			//{
-			//	new UserToFriend { User = user1, Friend = user2 },
-			//	new UserToFriend { User = user1, Friend = user3 }
-			//};
-			//user2.Friends = new List<UserToFriend>
-			//{
-			//	new UserToFriend { User = user2, Friend = user1 },
-			//	new UserToFriend { User = user2, Friend = user3 }
-			//};
-			//user3.Friends = new List<UserToFriend>
-			//{
-			//	new UserToFriend { User = user3, Friend = user1 },
-			//	new UserToFriend { User = user3, Friend = user2 }
-			//};
-			//_db.Users.UpdateRange(user1, user2, user3);
-			//await _db.SaveChangesAsync();
+			user1.Friends = new List<UserToFriend>
+			{
+				new UserToFriend { User = user1, FriendId = user2.Id },
+				new UserToFriend { User = user1, FriendId = user3.Id }
+			};
+			user2.Friends = new List<UserToFriend>
+			{
+				new UserToFriend { User = user2, FriendId = user1.Id },
+				new UserToFriend { User = user2, FriendId = user3.Id }
+			};
+			user3.Friends = new List<UserToFriend>
+			{
+				new UserToFriend { User = user3, FriendId = user1.Id },
+				new UserToFriend { User = user3, FriendId = user2.Id }
+			};
+			_db.Users.UpdateRange(user1, user2, user3);
+			await _db.SaveChangesAsync();
 
 
 			//user1.Requests.Add(new UserToRequest { RequesterId = user1.Id, ReceiverId = user2.Id });
