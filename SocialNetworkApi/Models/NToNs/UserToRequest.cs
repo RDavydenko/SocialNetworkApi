@@ -8,16 +8,12 @@ using System.Threading.Tasks;
 namespace SocialNetworkApi.Models.NToNs
 {
 	public class UserToRequest
-	{
-		[Key]
+	{		
 		public int Id { get; set; }
 
-		public int ReceiverId { get; set; } // Получатель
-		[ForeignKey("ReceiverId")]
-		public User Receiver { get; set; } // Получатель
+		public int UserId { get; set; } // Кто запросил
+		public User User { get; set; } // Кто запросил
 
-		public int RequesterId { get; set; } // Запрашивающий
-		[ForeignKey("RequesterId")]
-		public User Requester { get; set; } // Запрашивающий
+		public int RequestId { get; set; } // Кому запрашивает
 	}
 }

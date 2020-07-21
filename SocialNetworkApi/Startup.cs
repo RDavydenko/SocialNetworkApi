@@ -71,6 +71,7 @@ namespace SocialNetworkApi
 			app.UseAuthentication();
 			app.UseAuthorization();
 
+			//app.UseMiddleware<DbInitializeMiddleware>();
 			app.UseMiddleware<DbInitTriggersMiddleware>();
 			
 			app.UseEndpoints(endpoints =>

@@ -16,8 +16,8 @@ namespace SocialNetworkApi.Models
 		public List<Message> Messages { get; set; } // Сообщения
 
 		public List<NToNs.UserToFriend> Friends { get; set; } // Друзья
-		//public List<NToNs.UserToRequest> Requests { get; set; } // Запросы
-		//public List<NToNs.UserToFollower> Followers { get; set; } // Подписчики
+		public List<NToNs.UserToRequest> Requests { get; set; } // Запросы
+		public List<NToNs.UserToFollower> Followers { get; set; } // Подписчики
 
 
 		public User()
@@ -25,7 +25,8 @@ namespace SocialNetworkApi.Models
 			Dialogs = new List<NToNs.UserToDialog>();
 			Messages = new List<Message>();
 			Friends = new List<NToNs.UserToFriend>();
-			//Requests = new List<NToNs.UserToRequest>();
+			Requests = new List<NToNs.UserToRequest>();
+			Followers = new List<NToNs.UserToFollower>();
 		}
 	}
 }
