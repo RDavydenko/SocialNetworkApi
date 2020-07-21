@@ -95,5 +95,19 @@ namespace SocialNetworkApi.Controllers
 			}
 			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
 		}
+
+		[HttpGet]
+		[Route("NeedAuthorization")]
+		public IActionResult NeedAuthorization()
+		{
+			return new JsonResult(new Response { Ok = false, StatusCode = 401 });
+		}
+
+		[HttpGet]
+		[Route("AccessDenied")]
+		public IActionResult AccessDenied()
+		{
+			return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+		}
 	}
 }

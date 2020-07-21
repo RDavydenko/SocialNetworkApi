@@ -70,7 +70,7 @@ namespace SocialNetworkApi
 			app.UseCors(builder =>
 			{
 				builder.WithOrigins("https://localhost:44346");
-				builder.WithMethods("GET", "POST", "PUT", "DELETE");
+				builder.WithMethods("GET", "POST");
 				builder.AllowAnyHeader();
 			});
 
