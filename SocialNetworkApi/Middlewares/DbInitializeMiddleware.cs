@@ -8,7 +8,7 @@ using SocialNetworkApi.Models;
 using SocialNetworkApi.Models.NToNs;
 
 namespace SocialNetworkApi.Middlewares
-{
+{	
 	public class DbInitializeMiddleware
 	{
 		private readonly RequestDelegate _next;
@@ -26,7 +26,10 @@ namespace SocialNetworkApi.Middlewares
 			_userManager = context.RequestServices.GetService(typeof(UserManager<User>)) as UserManager<User>;
 
 			if (_db.Users.Count() != 0)
+			{
+				_db.Dispose();
 				return;
+			}
 
 			var user1 = new User { UserName = "Roman", NormalizedUserName = "ROMAN" };
 			var user2 = new User { UserName = "Admin", NormalizedUserName = "ADMIN" };
@@ -71,34 +74,20 @@ namespace SocialNetworkApi.Middlewares
 			await _db.SaveChangesAsync();
 
 
-			//user1.Friends = new List<UserToFriend>
-			//{
-			//	new UserToFriend { User = user1, Friend = user2 },
-			//	new UserToFriend { User = user1, Friend = user3 }
-			//};
-			//user2.Friends = new List<UserToFriend>
-			//{
-			//	new UserToFriend { User = user2, Friend = user1 },
-			//	new UserToFriend { User = user2, Friend = user3 }
-			//};
-			//user3.Friends = new List<UserToFriend>
-			//{
-			//	new UserToFriend { User = user3, Friend = user1 },
-			//	new UserToFriend { User = user3, Friend = user2 }
-			//};
-			//_db.Users.UpdateRange(user1, user2, user3);
-			//await _db.SaveChangesAsync();
+			var uf1 = new UserToFriend { User = user1, FriendId = user2.Id };
+			var uf2 = new UserToFriend { User = user1, FriendId = user3.Id };
+			var uf3 = new UserToFriend { User = user2, FriendId = user1.Id };
+			var uf5 = new UserToFriend { User = user3, FriendId = user1.Id };
+			_db.UserToFriends.AddRange(uf1, uf2, uf3, uf5);
+			await _db.SaveChangesAsync();
 
 
-			//user1.Requests.Add(new UserToRequest { RequesterId = user1.Id, ReceiverId = user2.Id });
-			//user2.Requests.Add(new UserToRequest { RequesterId = user2.Id, ReceiverId = user3.Id });
-			//user3.Requests.Add(new UserToRequest { RequesterId = user3.Id, ReceiverId = user1.Id });
-			//_db.Users.UpdateRange(user1, user2, user3);
-			//await _db.SaveChangesAsync();
-
-
-
-
+			var ufw1 = new UserToFollower { User = user2, FollowerId = user3.Id };
+			var ur1 = new UserToRequest { User = user3, RequestId = user2.Id };
+			_db.UserToFollowers.AddRange(ufw1);
+			_db.UserToRequests.AddRange(ur1);
+			await _db.SaveChangesAsync();
+			
 			await _next.Invoke(context);
 		}
 	}
