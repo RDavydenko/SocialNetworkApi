@@ -72,8 +72,8 @@ namespace SocialNetworkApi.Models
 				.HasForeignKey(ud => ud.UserId)
 				.OnDelete(DeleteBehavior.Cascade);
 				// При удалении главного User'а (по UserId) удаляется запись каскдно
-				// Нужен еще и триггер, который будет ставить null при удалении FriendId User'а - добавляется вручную (Resources/SQL/trigger_set_null_v2.sql)
-				
+				// Нужен еще и триггер, который будет ставить null при удалении FriendId User'а - добавляется автоматически // ✔
+
 			});
 			
 			

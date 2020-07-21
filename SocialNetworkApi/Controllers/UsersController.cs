@@ -43,6 +43,24 @@ namespace SocialNetworkApi.Controllers
 			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
 		}
 
+		[HttpGet]
+		[Route("{id}/friends")]
+		public async Task<IActionResult> GetFriends([FromRoute] int id)
+		{
+			if (ModelState.IsValid)
+			{
+				var user = await _context.Users.Include(u => u.Friends).FirstOrDefaultAsync(u => u.Id == id);
+				if (user == null)
+				{
+					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				}
+
+				var friendIds = user.Friends.Select(f => new FriendUserViewModel { Id = f.Id, FriendId = f.FriendId });
+				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = friendIds });
+			}
+			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+		}
+
 		[HttpPost]
 		[Authorize]
 		[Route("edit")]
@@ -59,6 +77,6 @@ namespace SocialNetworkApi.Controllers
 
 			var userViewModel = new UserViewModel(currentUser);
 			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = userViewModel });
-		}		
+		}
 	}
 }

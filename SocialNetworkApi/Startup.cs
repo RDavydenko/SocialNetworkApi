@@ -39,7 +39,8 @@ namespace SocialNetworkApi
 				options.Password.RequireDigit = false;
 				options.Password.RequireLowercase = false;
 				options.Password.RequireUppercase = false;
-				options.Password.RequireNonAlphanumeric = false;				
+				options.Password.RequireNonAlphanumeric = false;	
+								
 				
 			}).AddEntityFrameworkStores<ApplicationContext>();
 
@@ -63,15 +64,15 @@ namespace SocialNetworkApi
 			app.UseCors(builder =>
 			{
 				builder.WithOrigins("https://localhost:44346");
-				builder.WithMethods("GET", "POST", "PUT", "DELETE");
+				builder.WithMethods("GET", "POST");
 				builder.AllowAnyHeader();
 			});
 
 			app.UseAuthentication();
 			app.UseAuthorization();
 
-			app.UseMiddleware<DbInitializeMiddleware>();			
-
+			app.UseMiddleware<DbInitTriggersMiddleware>();
+			
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();

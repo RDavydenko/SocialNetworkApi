@@ -9,6 +9,7 @@ using SocialNetworkApi.Models.NToNs;
 
 namespace SocialNetworkApi.Middlewares
 {
+	[Obsolete("При использовании программа не грузит")]
 	public class DbInitializeMiddleware
 	{
 		private readonly RequestDelegate _next;
@@ -26,7 +27,10 @@ namespace SocialNetworkApi.Middlewares
 			_userManager = context.RequestServices.GetService(typeof(UserManager<User>)) as UserManager<User>;
 
 			if (_db.Users.Count() != 0)
+			{
+				_db.Dispose();
 				return;
+			}
 
 			var user1 = new User { UserName = "Roman", NormalizedUserName = "ROMAN" };
 			var user2 = new User { UserName = "Admin", NormalizedUserName = "ADMIN" };
@@ -71,22 +75,13 @@ namespace SocialNetworkApi.Middlewares
 			await _db.SaveChangesAsync();
 
 
-			user1.Friends = new List<UserToFriend>
-			{
-				new UserToFriend { User = user1, FriendId = user2.Id },
-				new UserToFriend { User = user1, FriendId = user3.Id }
-			};
-			user2.Friends = new List<UserToFriend>
-			{
-				new UserToFriend { User = user2, FriendId = user1.Id },
-				new UserToFriend { User = user2, FriendId = user3.Id }
-			};
-			user3.Friends = new List<UserToFriend>
-			{
-				new UserToFriend { User = user3, FriendId = user1.Id },
-				new UserToFriend { User = user3, FriendId = user2.Id }
-			};
-			_db.Users.UpdateRange(user1, user2, user3);
+			var uf1 = new UserToFriend { User = user1, FriendId = user2.Id };
+			var uf2 = new UserToFriend { User = user1, FriendId = user3.Id };
+			var uf3 = new UserToFriend { User = user2, FriendId = user1.Id };
+			var uf4 = new UserToFriend { User = user2, FriendId = user3.Id };
+			var uf5 = new UserToFriend { User = user3, FriendId = user1.Id };
+			var uf6 = new UserToFriend { User = user3, FriendId = user2.Id };
+			_db.UserToFriends.AddRange(uf1, uf2, uf3, uf4, uf5, uf6);
 			await _db.SaveChangesAsync();
 
 
@@ -98,7 +93,7 @@ namespace SocialNetworkApi.Middlewares
 
 
 
-
+			_db.Dispose();
 			await _next.Invoke(context);
 		}
 	}
