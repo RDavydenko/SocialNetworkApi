@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,7 @@ namespace SocialNetworkApi
 			{
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 			});
+
 			services.AddIdentity<User, IdentityRole<int>>(options =>
 			{
 				options.Password.RequireDigit = false;
@@ -42,10 +44,15 @@ namespace SocialNetworkApi
 				options.Password.RequireNonAlphanumeric = false;				
 				
 			}).AddEntityFrameworkStores<ApplicationContext>();
+			services.ConfigureApplicationCookie(options =>
+			{
+				options.LoginPath = new PathString("/api/Auth/NeedAuthorization");
+				options.AccessDeniedPath = new PathString("/api/Auth/AccessDenied");
+			});
+
 
 			services.AddControllers();
 			services.AddCors();
-
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,9 +76,7 @@ namespace SocialNetworkApi
 
 			app.UseAuthentication();
 			app.UseAuthorization();
-
-			//app.UseMiddleware<DbInitializeMiddleware>();
-
+						
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();

@@ -53,5 +53,19 @@ namespace SocialNetworkApi.Controllers
 			await _signInManager.SignOutAsync();
 			return new JsonResult(new Response { Ok = true, StatusCode = 200 });
 		}
+
+		[HttpGet]
+		[Route("NeedAuthorization")]
+		public IActionResult NeedAuthorization()
+		{
+			return new JsonResult(new Response { Ok = false, StatusCode = 401 });
+		}
+
+		[HttpGet]
+		[Route("AccessDenied")]
+		public IActionResult AccessDenied()
+		{
+			return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+		}
 	}
 }
