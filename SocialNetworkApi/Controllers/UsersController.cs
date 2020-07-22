@@ -126,6 +126,13 @@ namespace SocialNetworkApi.Controllers
 			{
 				return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашивающий пользователь не найден" });
 			}
+
+			var existingUser = await _userManager.FindByNameAsync(model.UserName);
+			if (existingUser != null)
+			{
+				return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Этот логин недоступен (занят)" });
+			}
+
 			model.UpdateFields(ref currentUser);
 			_context.Users.Update(currentUser);
 			await _context.SaveChangesAsync();
