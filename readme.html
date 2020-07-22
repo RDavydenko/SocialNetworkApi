@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Руководство программиста</title>
+
+	<style>
+		body {
+			background-color: rgb(219, 219, 219);
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 18px;
+		}
+
+		a:visited {
+			color: blue;
+		}
+
+		.container {
+			background-color: #fff;
+
+			max-width: 1920px;
+
+			margin: 0 auto;
+			padding: 15px;
+		}
+
+		.main-desc {
+			font-size: 20px;
+			border-bottom: 1px solid #000;
+
+			padding-bottom: 10px;
+		}
+
+		.block {
+
+			margin-bottom: 40px;
+		}
+
+		.block__title {
+			font-size: 40px;
+			text-transform: uppercase;
+
+			margin-bottom: 10px;
+		}
+
+		.method {
+			font-weight: 600;
+			border-radius: 10px;
+			text-align: center;
+
+			width: fit-content;
+
+			padding: 5px;
+		}
+
+		.method-post {
+			background-color: rgb(255, 208, 0);
+		}
+
+		.method-get {
+			background-color: rgb(100, 136, 255);
+		}
+
+		.url {
+			font-size: 18px;
+			color: rgb(100, 100, 100);
+		}
+
+		.param-type {
+			font-size: 15px;
+			font-style: italic;
+			color: rgb(100, 100, 100);
+		}
+
+		.status-code {
+			color: #fff;
+			padding: 0px 3px;
+		}
+
+		.code-200 {
+			background-color: rgb(7, 160, 45);
+		}
+
+		table {
+			width: 100%;
+		}
+
+		.query-param {
+			color: rgb(0, 38, 255);
+		}
+
+		table {
+			border-collapse: collapse;
+		}
+
+		table td {
+			border: 1px solid rgb(214, 214, 214);
+
+			text-align: left;
+			vertical-align: top;
+			padding: 10px;
+		}
+
+		.entity {
+			margin-bottom: 40px;
+		}
+
+		.entity__name {
+			font-size: 25px;
+			font-weight: 800;
+		}
+
+		.block table th:nth-child(1),
+		.block table td:nth-child(1) {
+			width: 5%;
+		}
+
+		.block table th:nth-child(2),
+		.block table td:nth-child(2) {
+			width: 25%;
+		}
+
+		.block table th:nth-child(3),
+		.block table td:nth-child(3) {
+			width: 15%;
+		}
+
+		.block table th:nth-child(4),
+		.block table td:nth-child(4) {
+			width: 15%;
+		}
+
+		.entity table th:nth-child(1),
+		.entity table td:nth-child(1) {
+			width: 30%;
+		}
+
+		.entity table th:nth-child(2),
+		.entity table td:nth-child(2) {
+			width: 20%;
+		}
+
+		.entity table th:nth-child(3),
+		.entity table td:nth-child(3) {
+			width: 50%;
+		}
+
+		.example {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 20px;
+		}
+
+		.example-body:nth-child(2) {
+			background-color: rgb(236, 239, 241);
+		}
+
+		.example-body:nth-child(3) {
+			background-color: rgb(237, 241, 236);
+		}
+
+		.example-body:nth-child(4) {
+			background-color: rgb(240, 236, 241);
+		}
+
+		.example-body:nth-child(5) {
+			background-color: rgb(241, 239, 236);
+		}
+
+		.example__number {
+			font-size: 22px;
+			margin-bottom: 5px;
+		}
+
+		.example__title {
+			text-align: center;
+			font-weight: 800;
+		}
+
+		.query {
+			text-align: left;
+			width: 40%;
+
+		}
+
+		.response {
+			width: 40%;
+		}
+
+		pre {
+			margin: 0;
+		}
+	</style>
+
+</head>
+
+<body>
+	<div class="container">
+
+		<p class="main-desc">Данное руководство представляет из себя описание всех доступных методов API, типов данных и
+			др. Примеры находятся <a href="#example">внизу</a> страницы</p>
+
+		<div class="methods" id="methods">
+			<div class="block">
+				<div class="block__title">Логирование и регистрация</div>
+				<table>
+					<tr>
+						<th>Метод</th>
+						<th>URL</th>
+						<th>Название</th>
+						<th>Параметры</th>
+						<th>Описание</th>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/auth/signin</td>
+						<td class="title">Вход</td>
+						<td class="params">
+							<ul>
+								<li>Username <span class="param-type">string</span></li>
+								<li>Password <span class="param-type">string</span></li>
+							</ul>
+						</td>
+						<td class="description">
+							Авторизует пользователя в системе.<br>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/auth/signout</td>
+						<td class="title">Выход</td>
+						<td class="params"></td>
+						<td class="description">Выходит из системы</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/auth/create</td>
+						<td class="title">Регистрация</td>
+						<td class="params">
+							<ul>
+								<li>Username <span class="param-type">string</span></li>
+								<li>Password <span class="param-type">string</span></li>
+							</ul>
+						</td>
+						<td class="description">Регистрирует нового пользователя и авторизует его.<br>
+							Username - длина от 6 до 32<br>
+							Password - длина от 6 до 16<br>
+					</tr>
+				</table>
+			</div>
+
+
+			<div class="block">
+				<div class="block__title">Пользователи</div>
+				<table>
+					<tr>
+						<th>Метод</th>
+						<th>URL</th>
+						<th>Название</th>
+						<th>Параметры</th>
+						<th>Описание</th>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/users/<span class="query-param">{id}</span></td>
+						<td class="title">О пользователе</td>
+						<td class="params"></td>
+						<td class="description">
+							Получить информацию о пользователе<br>
+							по <span class="query-param">id</span> - идентификатору пользователя.<br>
+							Возвращает один объект типа <a href="#user">User</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/users/me</td>
+						<td class="title">О себе</td>
+						<td class="params"></td>
+						<td class="description">
+							Получить информацию о пользователе (о себе)<br>
+							Возвращает один объект типа <a href="#user">User</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/users/edit</td>
+						<td class="title">Редактирование</td>
+						<td class="params">
+							Объект типа <a href="#user">User</a>
+						</td>
+						<td class="description">
+							Изменить данные пользователя<br>
+							Возвращает объект типа <a href="#user">User</a> с изменениями<br>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/users/<span class="query-param">{id}</span>/friends</td>
+						<td class="title">Список друзей</td>
+						<td class="params"></td>
+						<td class="description">
+							Получить список друзей пользователя<br>
+							по <span class="query-param">id</span> - идентификатору пользователя.<br>
+							Возвращает массив объектов с полями:<br>
+							Id - идентификатор дружбы<br>
+							FriendId - идентификатор пользователя друга
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/users/<span class="query-param">{id}</span>/followers</td>
+						<td class="title">Список подписчиков</td>
+						<td class="params"></td>
+						<td class="description">
+							Получить список подписчиков пользователя<br>
+							по <span class="query-param">id</span> - идентификатору пользователя.<br>
+							Возвращает массив объектов с полями:<br>
+							Id - идентификатор подписки<br>
+							FollowerId - идентификатор подписчика
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/users/<span class="query-param">{id}</span>/requests</td>
+						<td class="title">Список запросов</td>
+						<td class="params"></td>
+						<td class="description">
+							Получить список запросов пользователя<br>
+							по <span class="query-param">id</span> - идентификатору пользователя.<br>
+							Возвращает массив объектов с полями:<br>
+							Id - идентификатор запроса<br>
+							RequestId - идентификатор подписки
+						</td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="block">
+				<div class="block__title">Друзья, подписки и подписчики</div>
+				<table>
+					<tr>
+						<th>Метод</th>
+						<th>URL</th>
+						<th>Название</th>
+						<th>Параметры</th>
+						<th>Описание</th>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/friends/add/<span class="query-param">{id}</span></td>
+						<td class="title">Добавить в друзья</td>
+						<td class="params">
+
+						</td>
+						<td class="description">
+							Добавляет в друзья (либо подписывается)<br>
+							на пользователя по <span class="query-param">id</span> пользователя <br>
+							Возвращает объект с полями: <br>
+							Message - сообщение о проделаной операции <br>
+							Id - в зависимости от Message либо идентификатор дружбы, <br>
+							либо идентификатор запроса в друзья
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/friends/<span class="query-param">{friendshipId}</span>/remove</td>
+						<td class="title">Удалить из друзей</td>
+						<td class="params"></td>
+						<td class="description">
+							Удаляет из друзей по <span class="query-param">friendshipId</span> -- <br>
+							идентификатор дружбы (не пользователя)
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/friends/unfollow/<span class="query-param">{id}</span></td>
+						<td class="title">Отписаться</td>
+						<td class="params">
+						</td>
+						<td class="description">
+							Отписывает от пользователя (отменят запрос в друзья)<br>
+							по <span class="query-param">id</span> - идентификатору пользователя<br>
+					</tr>
+				</table>
+			</div>
+
+			<div class="block">
+				<div class="block__title">Диалоги</div>
+				<table>
+					<tr>
+						<th>Метод</th>
+						<th>URL</th>
+						<th>Название</th>
+						<th>Параметры</th>
+						<th>Описание</th>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/dialogs</td>
+						<td class="title">Список диалогов</td>
+						<td class="params">
+
+						</td>
+						<td class="description">
+							Получить список диалогов пользователя.<br>
+							Возвращает массив объектов типа <a href="#dialog">Dialog</a><br>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/dialogs/<span class="query-param">{id}</span>/messages</td>
+						<td class="title">Список сообщений диалога</td>
+						<td class="params"></td>
+						<td class="description">
+							Получить список сообщений из диалога с идентификатором <span class="query-param">id</span>.<br>
+							Возвращает массив объектов <a href="#message">Message</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/dialogs/<span class="query-param">{id}</span>/members</td>
+						<td class="title">Список участников</td>
+						<td class="params">
+						</td>
+						<td class="description">
+							Получить список участников диалога<br>
+							по <span class="query-param">id</span> - идентификатору диалога.<br>
+							Возвращает массив индентификаторов пользователей-участников.
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/dialogs/<span class="query-param">{id}</span>/message</td>
+						<td class="title">Написать сообщение</td>
+						<td class="params">
+							<ul>
+								<li>Text <span class="param-type">string</span></li>
+							</ul>
+						</td>
+						<td class="description">
+							Добавляет новое сообщение в диалог по <span class="query-param">id</span> диалога.<br>
+							Теxt - длина до 10000 <br>
+							Возвращает объект типа <a href="#message">Message</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/dialogs/create</td>
+						<td class="title">Создать диалог</td>
+						<td class="params">
+							<ul>
+								<li>Title <span class="param-type">string</span></li>
+							</ul>
+						</td>
+						<td class="description">
+							Создает новый диалог с названием Title.<br>
+							Title - длина от 1 до 32<br>
+							Возвращает объект типа <a href="#dialog">Dialog</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/dialogs/<span class="query-param">{id}</span>/add</td>
+						<td class="title">Добавить пользователей</td>
+						<td class="params">
+							<ul>
+								<li>UserIds <span class="param-type">массив int</span></li>
+							</ul>
+						</td>
+						<td class="description">
+							Добавляет пользователей в диалог по <span class="query-param">id</span> диалога.<br>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/dialogs/<span class="query-param">{id}</span>/leave</td>
+						<td class="title">Выйти из диалога</td>
+						<td class="params">
+						</td>
+						<td class="description">
+							Позволяет пользователю выйти из диалога<br>
+							по <span class="query-param">id</span> диалога.
+						</td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="block">
+				<div class="block__title">Сообщения</div>
+				<table>
+					<tr>
+						<th>Метод</th>
+						<th>URL</th>
+						<th>Название</th>
+						<th>Параметры</th>
+						<th>Описание</th>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-get">GET</div>
+						</td>
+						<td class="url">/api/messages/<span class="query-param">{id}</span></td>
+						<td class="title">Инфо о сообщении</td>
+						<td class="params">
+						</td>
+						<td class="description">
+							Получить одно сообщение по <span class="query-param">id</span> сообщения.<br>
+							Возвращает объект типа <a href="#message">Message</a><br>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/messages/<span class="query-param">{id}</span>/edit</td>
+						<td class="title">Редактирование</td>
+						<td class="params">
+							<ul>
+								<li>Объект типа <a href="#message">Message</a></li>
+							</ul>
+						</td>
+						<td class="description">
+							Редактирует сообщение по <span class="query-param">id</span> сообщения.<br>
+							Возвращает объект типа <a href="#message">Message</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="method method-post">POST</div>
+						</td>
+						<td class="url">/api/messages/<span class="query-param">{id}</span>/delete</td>
+						<td class="title">Удалить</td>
+						<td class="params">
+						</td>
+						<td class="description">
+							Удаляет сообщение пользователя<br>
+							по <span class="query-param">id</span> - идентификатору сообщения.<br>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+
+
+		<div class="block">
+			<div class="block__title">Типы данных</div>
+
+			<div class="entity">
+				<div id="user" class="entity__name">User (пользователь)</div>
+				<div class="entity__fields">
+					<table>
+						<tr>
+							<th>Название</th>
+							<th>Тип данных</th>
+							<th>Описание</th>
+						</tr>
+						<tr>
+							<td>Id</td>
+							<td><span class="param-type">int</span></td>
+							<td>Уникальный идентификатор</td>
+						</tr>
+						<tr>
+							<td>UserName</td>
+							<td><span class="param-type">string</span></td>
+							<td>Логин</td>
+						</tr>
+						<tr>
+							<td>Email</td>
+							<td><span class="param-type">string</span></td>
+							<td>Адрес электронной почты</td>
+						</tr>
+						<tr>
+							<td>BirthdayDate</td>
+							<td><span class="param-type">string</span></td>
+							<td>Дата рождения</td>
+						</tr>
+						<tr>
+							<td>Sex</td>
+							<td><span class="param-type">int</span></td>
+							<td>Пол
+								<ul>
+									<li>0 - Мужской</li>
+									<li>1 - Женский</li>
+									<li>2 - Другой</li>
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<td>Status</td>
+							<td><span class="param-type">string</span></td>
+							<td>Статус</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			<div class="entity">
+				<div id="dialog" class="entity__name">Dialog (диалог)</div>
+				<div class="entity__fields">
+					<table>
+						<tr>
+							<th>Название</th>
+							<th>Тип данных</th>
+							<th>Описание</th>
+						</tr>
+						<tr>
+							<td>Id</td>
+							<td><span class="param-type">int</span></td>
+							<td>Уникальный идентификатор</td>
+						</tr>
+						<tr>
+							<td>Title</td>
+							<td><span class="param-type">string</span></td>
+							<td>Название</td>
+						</tr>
+						<tr>
+							<td>CreatingTime</td>
+							<td><span class="param-type">DateTime</span></td>
+							<td>Дата создания диалога</td>
+						</tr>
+						<tr>
+							<td>LastMessageTime</td>
+							<td><span class="param-type">DateTime</span></td>
+							<td>Дата последнего сообщения</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			<div class="entity">
+				<div id="message" class="entity__name">Message (сообщение)</div>
+				<div class="entity__fields">
+					<table>
+						<tr>
+							<th>Название</th>
+							<th>Тип данных</th>
+							<th>Описание</th>
+						</tr>
+						<tr>
+							<td>Id</td>
+							<td><span class="param-type">int</span></td>
+							<td>Уникальный идентификатор</td>
+						</tr>
+						<tr>
+							<td>Text</td>
+							<td><span class="param-type">string</span></td>
+							<td>Текст сообщения</td>
+						</tr>
+						<tr>
+							<td>SendingTime</td>
+							<td><span class="param-type">DateTime</span></td>
+							<td>Время отправки</td>
+						</tr>
+						<tr>
+							<td>AuthorId</td>
+							<td><span class="param-type">int</span></td>
+							<td>Уникальный идентификатор автора сообщения</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			<div class="entity">
+				<div id="response" class="entity__name">Reponse (ответ от сервера)</div>
+				<div class="entity__fields">
+					<table>
+						<tr>
+							<th>Название</th>
+							<th>Тип данных</th>
+							<th>Описание</th>
+						</tr>
+						<tr>
+							<td>Ok</td>
+							<td><span class="param-type">bool</span></td>
+							<td>Если <strong>true</strong> - успешное выполнение,<br>
+								если <strong>false</strong> - ошибка при выполнении
+							</td>
+						</tr>
+						<tr>
+							<td>StatusCode</td>
+							<td><span class="param-type">int</span></td>
+							<td>Статусный код ответа</td>
+						</tr>
+						<tr>
+							<td>Description</td>
+							<td><span class="param-type">string</span></td>
+							<td>Человекочитаемое описание причины ошибки</td>
+						</tr>
+						<tr>
+							<td>Result</td>
+							<td><span class="param-type">Любой</span></td>
+							<td>Возвращаемый результат, если таковой ожидается <br>
+								(<a href="#methods">см.</a> какой метод, что возвращает)
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="block">
+			<div id="example" class="block__title">Примеры</div>
+			<div class="example-body">
+				<div class="example__number">1) Логирование (успешное)</div>
+				<div class="example">
+					<div class="query">
+						<div class="example__title">Запрос</div>
+						<pre>
+					<code>
+$.ajax({
+	url: '/api/auth/signin',
+	type: 'POST',
+	contentType: 'application/json; charset=utf-8',
+	data: JSON.stringify({
+		username: 'User',
+		password: '123456'
+	}),
+	dataType: 'json',
+	success: function(result) {
+		console.log(result);
+	}
+});
+					</code>
+				</pre>
+					</div>
+					<div class="response">
+						<div class="example__title">Ответ</div>
+						<pre>
+						<code>
+{
+	"ok": true,
+	"statusCode": 200,
+	"description": null,
+	"result": null
+}
+						</code>
+					</pre>
+					</div>
+				</div>
+			</div>
+
+			<div class="example-body">
+				<div class="example__number">2) Получение списка друзей</div>
+				<div class="example">
+					<div class="query">
+						<div class="example__title">Запрос</div>
+						<pre>
+					<code>
+$.ajax({
+	url: '/api/users/1/friends',
+	type: 'GET',	
+	dataType: 'json',
+	success: function(result) {
+		console.log(result);
+	}
+});
+					</code>
+				</pre>
+					</div>
+					<div class="response">
+						<div class="example__title">Ответ</div>
+						<pre>
+						<code>
+{
+	"ok": true,
+	"statusCode": 200,
+	"description": null,
+	"result": [
+	{
+		"id": 3,
+		"friendId": 3
+	},
+	{
+		"id": 4,
+		"friendId": 2
+	}
+	]
+}
+						</code>
+					</pre>
+					</div>
+				</div>
+			</div>
+
+			<div class="example-body">
+				<div class="example__number">3) Получение информации о сообщении (неудача)</div>
+				<div class="example">
+					<div class="query">
+						<div class="example__title">Запрос</div>
+						<pre>
+					<code>
+$.ajax({
+	url: '/api/messages/1000',
+	type: 'GET',	
+	dataType: 'json',
+	success: function(result) {
+		console.log(result);
+	}
+});
+					</code>
+				</pre>
+					</div>
+					<div class="response">
+						<div class="example__title">Ответ</div>
+						<pre>
+						<code>
+{
+	"ok": false,
+	"statusCode": 404,
+	"description": "Сообщение не найдено",
+	"result": null
+}
+						</code>
+					</pre>
+					</div>
+				</div>
+			</div>
+
+			<div class="example-body">
+				<div class="example__number">4) Редактирование пользователя (передача и получение сложного объекта)</div>
+				<div class="example">
+					<div class="query">
+						<div class="example__title">Запрос</div>
+						<pre>
+					<code>
+$.ajax({
+	url: '/api/users/edit',
+	type: 'POST',
+	contentType: 'application/json; charset=utf-8',
+	data: JSON.stringify({
+		username: 'Ivan',
+		status: 'У меня новый статус!',
+		sex: 0
+	}),
+	dataType: 'json',
+	success: function(result) {
+		console.log(result);
+	}
+});
+					</code>
+				</pre>
+					</div>
+					<div class="response">
+						<div class="example__title">Ответ</div>
+						<pre>
+						<code>
+{
+	"ok": true,
+	"statusCode": 200,
+	"description": null,
+	"result": {
+	    "id": 2,
+	    "userName": "Ivan",
+	    "email": null,
+	    "birthdayDate": null,
+	    "sex": 0,
+	    "status": "У меня новый статус!"
+	}
+}
+						</code>
+					</pre>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+
+</html>
