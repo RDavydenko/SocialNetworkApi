@@ -32,13 +32,13 @@ namespace SocialNetworkApi.Controllers
 			var userToFriend = await _context.UserToFriends.FirstOrDefaultAsync(x => x.UserId == userId && x.FriendId == friendId);
 			if (userToFriend != null) // Уже друзья
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователи уже в друзьях друг у друга" });
 			}
 
 			var userToRequest = await _context.UserToRequests.FirstOrDefaultAsync(x => x.UserId == userId && x.RequestId == friendId);
 			if (userToRequest != null) // Уже имеет запрос пользователю с Id = friendId. Аналогично уже имеется зеркальная запись в подписчиках юзера с Id = friendId
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователь уже отправил заявку" });
 			}
 
 			var mirrorUserToRequest = await _context.UserToRequests.FirstOrDefaultAsync(x => x.UserId == friendId && x.RequestId == userId);
@@ -76,23 +76,23 @@ namespace SocialNetworkApi.Controllers
 				var user = await _userManager.GetUserAsync(User);
 				if (user == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашивающий пользователь не найден" });
 				}
 
 				var friend = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 				if (friend == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый пользователь не найден" });
 				}
 
 				if (friend.Id == user.Id)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Нельзя добавить себя в друзья" });
 				}
 
 				return await TrySendFriendRequestAsync(user.Id, friend.Id);
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpPost]
@@ -104,18 +104,18 @@ namespace SocialNetworkApi.Controllers
 				var user = await _userManager.GetUserAsync(User);
 				if (user == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашивающий пользователь не найден" });
 				}
 
 				var userToFriend = await _context.UserToFriends.FirstOrDefaultAsync(x => x.Id == userToFriendId);
 				if (userToFriend == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Не найдено такой дружбы" });
 				}
 
 				if (userToFriend.UserId != user.Id)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "У пользователя нет такой дружбы" });
 				}
 
 				if (userToFriend.FriendId == null)
@@ -141,7 +141,7 @@ namespace SocialNetworkApi.Controllers
 					return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = new { Message = "Existing user removed", FollowerId = followerId } });
 				}
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpPost]
@@ -153,13 +153,13 @@ namespace SocialNetworkApi.Controllers
 				var user = await _userManager.GetUserAsync(User);
 				if (user == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашивающий пользователь не найден" });
 				}
 
 				var userToRequest = await _context.UserToRequests.FirstOrDefaultAsync(x => x.UserId == user.Id && x.RequestId == userId);
 				if (userToRequest == null) // Если нет такого запроса
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрос в друзья не найден" });
 				}
 				else // Если запрос есть, то удаляем запрос и подписчика
 				{
@@ -170,7 +170,7 @@ namespace SocialNetworkApi.Controllers
 					return new JsonResult(new Response { Ok = false, StatusCode = 200, Result = new { Message = "Unfollowed", OldRequestedId = userId } });
 				}
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 	}
 }

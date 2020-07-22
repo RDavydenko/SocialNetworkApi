@@ -16,8 +16,8 @@ namespace SocialNetworkApi.Models
 		public List<Message> Messages { get; set; } // Сообщения
 
 		public List<NToNs.UserToFriend> Friends { get; set; } // Друзья
-		public List<NToNs.UserToRequest> Requests { get; set; } // Запросы
-		public List<NToNs.UserToFollower> Followers { get; set; } // Подписчики
+		public List<NToNs.UserToRequest> Requests { get; set; } // Исходящие запросы (подписки)
+		public List<NToNs.UserToFollower> Followers { get; set; } // Подписчики (входящие запросы)
 
 
 		public User()

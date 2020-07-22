@@ -35,12 +35,12 @@ namespace SocialNetworkApi.Controllers
 				var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 				if (user == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый пользователь не найден" });
 				}
 				var userViewModel = new UserViewModel(user);
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = userViewModel });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpGet]
@@ -53,13 +53,13 @@ namespace SocialNetworkApi.Controllers
 				var user = await _userManager.GetUserAsync(User);
 				if (user == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашивающий пользователь не найден" });
 				}
 
 				var userViewModel = new UserViewModel(user);
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = userViewModel });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpGet]
@@ -71,13 +71,13 @@ namespace SocialNetworkApi.Controllers
 				var user = await _context.Users.Include(u => u.Friends).FirstOrDefaultAsync(u => u.Id == id);
 				if (user == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый пользователь не найден" });
 				}
 
 				var friendIds = user.Friends.Select(f => new FriendUserViewModel { Id = f.Id, FriendId = f.FriendId });
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = friendIds });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpGet]
@@ -89,13 +89,13 @@ namespace SocialNetworkApi.Controllers
 				var user = await _context.Users.Include(u => u.Followers).FirstOrDefaultAsync(u => u.Id == id);
 				if (user == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый пользователь не найден" });
 				}
 
 				var followerIds = user.Followers.Select(f => new { Id = f.Id, FollowerId = f.FollowerId });
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = followerIds });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpGet]
@@ -107,13 +107,13 @@ namespace SocialNetworkApi.Controllers
 				var user = await _context.Users.Include(u => u.Requests).FirstOrDefaultAsync(u => u.Id == id);
 				if (user == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый пользователь не найден" });
 				}
 
 				var requestsIds = user.Requests.Select(f => new { Id = f.Id, RequestId = f.RequestId });
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = requestsIds });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpPost]
@@ -124,7 +124,7 @@ namespace SocialNetworkApi.Controllers
 			var currentUser = await _userManager.GetUserAsync(User);
 			if (currentUser == null)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашивающий пользователь не найден" });
 			}
 			model.UpdateFields(ref currentUser);
 			_context.Users.Update(currentUser);
@@ -133,7 +133,5 @@ namespace SocialNetworkApi.Controllers
 			var userViewModel = new UserViewModel(currentUser);
 			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = userViewModel });
 		}
-
-
 	}
 }

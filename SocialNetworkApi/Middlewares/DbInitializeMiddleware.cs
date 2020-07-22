@@ -27,7 +27,7 @@ namespace SocialNetworkApi.Middlewares
 
 			if (_db.Users.Count() != 0)
 			{
-				_db.Dispose();
+				await _next.Invoke(context);
 				return;
 			}
 

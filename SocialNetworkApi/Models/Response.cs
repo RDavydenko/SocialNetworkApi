@@ -11,6 +11,8 @@ namespace SocialNetworkApi.Models
 
 		public int StatusCode { get; set; } // Статус код (200, 400 и др)
 
+		public string Description { get; set; } // Человекочитаемое описание ошибки
+
 		public object Result { get; set; } // Результат операции (если имеется)
 	}
 }

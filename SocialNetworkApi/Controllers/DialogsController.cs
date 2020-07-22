@@ -37,7 +37,7 @@ namespace SocialNetworkApi.Controllers
 					.FirstOrDefaultAsync(u => u.Id == userId);
 			if (user == null)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашивающий пользователь не найден" });
 			}
 
 			var dialogs = user.Dialogs.Select(d => new DialogSimpleViewModel(d.Dialog)).ToList();
@@ -58,13 +58,13 @@ namespace SocialNetworkApi.Controllers
 
 				if (userToDialog == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый диалог не найден" });
 				}
 
 				var messages = userToDialog.Dialog.Messages.Select(m => new MessageViewModel(m)).ToList();
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = messages });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpGet]
@@ -81,13 +81,13 @@ namespace SocialNetworkApi.Controllers
 
 				if (userToDialog == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый диалог не найден" });
 				}
 
 				var users = userToDialog.Dialog.Users.Select(u => u.UserId).ToList();
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = users });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpPost]
@@ -101,48 +101,54 @@ namespace SocialNetworkApi.Controllers
 				.FirstOrDefaultAsync(d => d.Id == id);
 				if (dialog == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый диалог не найден" });
 				}
 
 				var currentUser = await _userManager.GetUserAsync(User);
 				if (!dialog.Users.Exists(d => d.UserId == currentUser.Id)) // Пользователь не состоит в диалоге
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователь не состоит в этом диалоге" });
 				}
 
 				if (string.IsNullOrWhiteSpace(model.Text) || model.Text.Length > 10000)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Сообщение не соответствует требованиям (Длина до 10000)" });
 				}
 
 				var newMessage = new Message { AuthorId = currentUser.Id, DialogId = dialog.Id, Text = model.Text, SendingTime = DateTime.Now };
 				_context.Messages.Add(newMessage);
+				dialog.LastMessageTime = newMessage.SendingTime;
+				_context.Dialogs.Update(dialog);
 				await _context.SaveChangesAsync();
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = new MessageViewModel(newMessage) });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpPost]
 		[Route("create")]
 		public async Task<IActionResult> CreateDialog([FromBody] DialogSimpleViewModel model)
 		{
-			if (string.IsNullOrWhiteSpace(model.Title) || model.Title.Length < 1 || model.Title.Length > 32)
+			if (ModelState.IsValid)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+				if (string.IsNullOrWhiteSpace(model.Title) || model.Title.Length < 1 || model.Title.Length > 32)
+				{
+					return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Название диалога не соответствует требованиям (Длина от 1 до 32)" });
+				}
+
+				var user = await _userManager.GetUserAsync(User);
+
+				var newDialog = new Dialog { Title = model.Title, CreatingTime = DateTime.Now, LastMessageTime = DateTime.Now };
+				_context.Dialogs.Add(newDialog);
+				await _context.SaveChangesAsync();
+
+				_context.UserToDialogs.Add(new Models.NToNs.UserToDialog { DialogId = newDialog.Id, UserId = user.Id });
+				await _context.SaveChangesAsync();
+
+				var dialogViewModel = new DialogSimpleViewModel(newDialog);
+				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = dialogViewModel }); 
 			}
-
-			var user = await _userManager.GetUserAsync(User);
-
-			var newDialog = new Dialog { Title = model.Title, CreatingTime = DateTime.Now, LastMessageTime = DateTime.Now };
-			_context.Dialogs.Add(newDialog);
-			await _context.SaveChangesAsync();
-
-			_context.UserToDialogs.Add(new Models.NToNs.UserToDialog { DialogId = newDialog.Id, UserId = user.Id });
-			await _context.SaveChangesAsync();
-
-			var dialogViewModel = new DialogSimpleViewModel(newDialog);
-			return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = dialogViewModel });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpPost]
@@ -154,13 +160,13 @@ namespace SocialNetworkApi.Controllers
 				.FirstOrDefaultAsync(d => d.Id == id);
 			if (dialog == null)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый диалог не найден" });
 			}
 
 			var currentUser = await _userManager.GetUserAsync(User);
 			if (!dialog.Users.Exists(d => d.UserId == currentUser.Id)) // Пользователь не состоит в диалоге
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователь не состоит в диалоге, в который хочет добавить другого пользователя" });
 			}
 
 			var userToDialogs = new List<Models.NToNs.UserToDialog>();
@@ -185,7 +191,7 @@ namespace SocialNetworkApi.Controllers
 				.FirstOrDefaultAsync(d => d.Id == id);
 			if (dialog == null)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашиваемый диалог не найден" });
 			}
 
 			var currentUser = await _userManager.GetUserAsync(User);
@@ -193,7 +199,7 @@ namespace SocialNetworkApi.Controllers
 			var userToDialog = dialog.Users.FirstOrDefault(d => d.UserId == currentUser.Id);
 			if (userToDialog == null)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Пользователь не состоит в диалоге" });
 			}
 			_context.UserToDialogs.Remove(userToDialog);
 			await _context.SaveChangesAsync();

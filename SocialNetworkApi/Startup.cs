@@ -76,7 +76,10 @@ namespace SocialNetworkApi
 
 			app.UseAuthentication();
 			app.UseAuthorization();
-						
+
+			app.UseMiddleware<DbInitializeMiddleware>(); // Инициализация БД тестовыми данными, если в БД пусто
+			app.UseMiddleware<DbInitTriggersMiddleware>(); // Инициализация БД необходимыми триггерами !!! Обязательно
+
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();

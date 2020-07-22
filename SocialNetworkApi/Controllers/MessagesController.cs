@@ -57,18 +57,18 @@ namespace SocialNetworkApi.Controllers
 			var currentUser = await _userManager.GetUserAsync(User);
 			if (currentUser == null)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Запрашивающий пользователь не найден" });
 			}
 
 			var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
 			if (message == null)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Сообщение не найдено" });
 			}
 
 			if (message.AuthorId != currentUser.Id)
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователь не является автором этого сообщения" });
 			}
 
 			var messageViewModel = new MessageViewModel(message);
@@ -85,18 +85,18 @@ namespace SocialNetworkApi.Controllers
 				var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
 				if (message == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Сообщение не найдено" });
 				}
 
 				var currentUser = await _userManager.GetUserAsync(User);
 				if (message.AuthorId != currentUser.Id)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователь не является автором этого сообщения" });
 				}
 
 				if (string.IsNullOrWhiteSpace(model.Text) || model.Text.Length < 1 || model.Text.Length > 10000)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Текст сообщения не соответствует требованиям (Длина до 10000)" });
 				}
 
 				message.Text = model.Text;
@@ -104,7 +104,7 @@ namespace SocialNetworkApi.Controllers
 				await _context.SaveChangesAsync();
 				return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = new MessageViewModel(message) }); 
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 		
 		[HttpPost]
@@ -116,20 +116,20 @@ namespace SocialNetworkApi.Controllers
 				var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
 				if (message == null)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Сообщение не найдено" });
 				}
 
 				var currentUser = await _userManager.GetUserAsync(User);
 				if (message.AuthorId != currentUser.Id)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователь не является автором этого сообщения" });
 				}
 								
 				_context.Messages.Remove(message);
 				await _context.SaveChangesAsync();
 				return new JsonResult(new Response { Ok = true, StatusCode = 200 });
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 	}
 }

@@ -37,12 +37,12 @@ namespace SocialNetworkApi.Controllers
 				}
 				else
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 404 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 404, Description = "Логин и(или) пароль неверные" });
 				}
 			}
 			else
 			{
-				return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+				return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 			}
 		}
 
@@ -62,30 +62,30 @@ namespace SocialNetworkApi.Controllers
 			{
 				if (User.Identity.IsAuthenticated)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователь уже аутентифицирован, необходимо сначала выйти" });
 				}
 
 				if (model.UserName == null || string.IsNullOrWhiteSpace(model.UserName) || model.UserName.Length < 3 || model.UserName.Length > 32)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Логин не соответствует требованиям (Длина от 3 до 32)" });
 				}
 
 				if (model.Password == null || string.IsNullOrWhiteSpace(model.Password) || model.Password.Length < 6 || model.Password.Length > 16)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Пароль не соответсвует требованиям (Длина от 6 до 16)" });
 				}
 
 				var checkUser = await _signInManager.UserManager.FindByNameAsync(model.UserName);
 				if (checkUser != null) // Такой уже есть пользователь
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Пользователь с таким логином уже существует" });
 				}
 
 				var newUser = new User { UserName = model.UserName, NormalizedUserName = model.UserName.ToUpper() };
 				var result = await _signInManager.UserManager.CreateAsync(newUser, model.Password);
 				if (!result.Succeeded)
 				{
-					return new JsonResult(new Response { Ok = false, StatusCode = 500 });
+					return new JsonResult(new Response { Ok = false, StatusCode = 500, Description = "Произошла ошибка при регистрации" });
 				}
 				else
 				{
@@ -93,21 +93,21 @@ namespace SocialNetworkApi.Controllers
 					return new JsonResult(new Response { Ok = true, StatusCode = 200, Result = new { Message = "Created and signined" } });
 				}
 			}
-			return new JsonResult(new Response { Ok = false, StatusCode = 400 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 400, Description = "Заполнены не все (либо неверно) поля запроса" });
 		}
 
 		[HttpGet]
 		[Route("NeedAuthorization")]
 		public IActionResult NeedAuthorization()
 		{
-			return new JsonResult(new Response { Ok = false, StatusCode = 401 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 401, Description = "Необходима авторизация в системе" });
 		}
 
 		[HttpGet]
 		[Route("AccessDenied")]
 		public IActionResult AccessDenied()
 		{
-			return new JsonResult(new Response { Ok = false, StatusCode = 403 });
+			return new JsonResult(new Response { Ok = false, StatusCode = 403, Description = "Нет доступа к ресурсу" });
 		}
 	}
 }
